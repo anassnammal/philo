@@ -1,0 +1,6 @@
+{
+    "editor.detectIndentation": false,
+    "C_Cpp.default.compilerPath": "/usr/bin/clang",
+    "editor.indentSize": "tabSize",
+    "editor.insertSpaces": false
+}
