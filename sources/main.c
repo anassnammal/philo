@@ -52,6 +52,5 @@ int main(int ac, char const **av)
 		write(STDOUT_FILENO, "Error!\ninvalid params\n", 22);
 		return (EXIT_FAILURE);
 	}
-
 	return 0;
 }
