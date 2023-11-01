@@ -10,6 +10,12 @@
 #include <pthread.h>
 #include <sys/time.h>
 
+#define GET_PHILOS_PTR	0x0
+#define LAUNCH_PHILOS	0x1
+#define DESTROY_FORKS	0x2
+#define	DETACH_PHILOS	0x4
+#define JOIN_PHILOS		0x8
+
 typedef struct s_var
 {
 	uint64_t	n_philo;
