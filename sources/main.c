@@ -1,6 +1,6 @@
 #include "philo.h"
 
-bool	philo_parse_params(t_var *params, int c, char const **av)
+static bool	philo_parse_params(t_var *params, int c, char const **av)
 {
 	int	*ptr;
 
@@ -17,15 +17,44 @@ bool	philo_parse_params(t_var *params, int c, char const **av)
 	return (true);
 }
 
+static bool	philo_init(t_var *params)
+{
+	t_philos	*philos;
+	uint64_t	i;
 
+	philos = philo(GET_PHILOS_PTR);
+	philos->philos = (pthread_t *)malloc(sizeof(pthread_t) * params->n_philo);
+	if (philos->philos == NULL)
+		return (philo(CLEAR_STCVAR), false);
+	philos->forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * params->n_philo);
+	if (philos->forks == NULL)
+		return (philo(CLEAR_ALL_MEM), false);
+	philos->params = params;
+	i = 0;
+	while (i < params->n_philo)
+	{
+		if (pthread_mutex_init(&philos->forks[i], NULL))
+			return (philo_forks_destroy(i), philo(CLEAR_ALL_MEM), false);
+		i++;
+	}
+	if (pthread_mutex_init(&philos->print, NULL))
+		return (philo(CLEAR_ALL_MEM | DESTROY_FORKS), false);
+	return (&philos);
+}
 
 int main(int ac, char const **av)
 {
 	t_var	params;
 
+	memset(&params, 0, sizeof(t_var));
 	if (!parse_params(&params, ac - 1, av + 1))
 	{
 		write(STDOUT_FILENO, "Error!\ninvalid params\n", 22);
+		return (EXIT_FAILURE);
+	}
+	if (!philo_init(&params))
+	{
+		write(STDOUT_FILENO, "Error!\nfailed to get enough resources\n", 38);
 		return (EXIT_FAILURE);
 	}
 	return 0;

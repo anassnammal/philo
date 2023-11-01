@@ -15,6 +15,12 @@
 #define DESTROY_FORKS	0x2
 #define	DETACH_PHILOS	0x4
 #define JOIN_PHILOS		0x8
+#define DESTROY_PRINT	0x10
+#define RELEASE_MEMORY	0x20
+#define CLEAR_STCVAR	0x40
+
+#define CLEAR_ALL_MEM	0x60
+#define RELEASE_ALL		0x72
 
 typedef struct s_var
 {
@@ -32,14 +38,6 @@ typedef enum e_state
 	SLEEPING
 }	t_state;
 
-typedef struct s_philos
-{
-	pthread_t		*philos;
-	pthread_mutex_t	*forks;
-	pthread_mutex_t	print;
-	t_var			*params;
-}					t_philos;
-
 typedef struct s_philo
 {
 	pthread_mutex_t	*r_forks;
@@ -48,8 +46,16 @@ typedef struct s_philo
 	uint64_t		meal_count;
 }					t_philo;
 
+typedef struct s_philos
+{
+	pthread_t		*philos;
+	pthread_mutex_t	*forks;
+	pthread_mutex_t	print;
+	t_var			*params;
+}					t_philos;
 
 
+t_philos	*philo(uint8_t operation);
 // parse utils
 int	ft_atoi(const char *str);
 
