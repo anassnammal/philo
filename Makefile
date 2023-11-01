@@ -1,30 +1,33 @@
 NAME=philo
 INCDIR=includes
 SRCDIR=sources
-OBJDIR=object
+OBJDIR=objects
 HEADER=$(INCDIR)/$(NAME:=.h)
 SOURCES=$(wildcard $(SRCDIR)/*.c)
 OBJECTS=$(addprefix $(OBJDIR)/, $(notdir $(patsubst %.c, %.o, $(SOURCES))))
 
 CCOMPILER=cc
-CLIBRARY= -pthread
-CFLAGS= -g -Werror -Wall -Wextra -fsanitize=thread
+CLIBRARY=-pthread
+CFLAGS=-g -Werror -Wall -Wextra -fsanitize=thread
 
-all : $(NAME)
 
-$(NAME) : $(OBJECTS)
-	$(CCOMPILER) $(CFLAGS) $^ $(CLIBRARY) -o $@.out
+all: $(NAME)
 
-%.o : %.c
-	$(CCOMPILER) $(CFLAGS) -c $<
+$(NAME): mkd $(OBJECTS)
+	$(CCOMPILER) $(CFLAGS) $^ $(CLIBRARY) -o $@
 
-clean :
+$(OBJDIR)/%.o: $(SRCDIR)/%.c
+	$(CCOMPILER) $(CFLAGS) -c $< -I $(INCDIR)/ -o $@
+
+mkd:
+	mkdir -p $(OBJDIR)
+
+clean:
 	rm -rf $(OBJDIR)
 
-fclean : clean
+fclean: clean
 	rm -rf $(NAME)
 
-re : fclean all
+re: fclean all
 
-.PHONY : all clean fclean re
-
+.PHONY : all mkd clean fclean re

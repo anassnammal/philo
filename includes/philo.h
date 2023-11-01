@@ -22,29 +22,29 @@
 #define CLEAR_ALL_MEM	0x60
 #define RELEASE_ALL		0x72
 
+#define M_TAKEFORK	"has taken a fork"
+#define M_EATING	"is eating"
+#define M_SLEEPING	"is sleeping"
+#define M_THINKING	"is thinking"
+#define M_DIE		"die"
+
 typedef struct s_var
 {
-	uint64_t	n_philo;
-	uint64_t	n_meals;
-	uint64_t	t_todie;
-	uint64_t	t_toeat;
-	uint64_t	t_tosleep;
-}				t_var;
+	int	n_philo;
+	int	n_meals;
+	int	t_todie;
+	int	t_toeat;
+	int	t_tosleep;
+}		t_var;
 
 typedef enum e_state
 {
 	THINKING,
 	EATING,
-	SLEEPING
+	SLEEPING,
+	DEAD,
+	FINICHED
 }	t_state;
-
-typedef struct s_philo
-{
-	pthread_mutex_t	*r_forks;
-	pthread_mutex_t	*l_forks;
-	t_state			state;
-	uint64_t		meal_count;
-}					t_philo;
 
 typedef struct s_philos
 {
@@ -54,10 +54,26 @@ typedef struct s_philos
 	t_var			*params;
 }					t_philos;
 
+typedef struct s_philo
+{
+	int				philo;
+	pthread_mutex_t	*r_forks;
+	pthread_mutex_t	*l_forks;
+	t_state			state;
+	int				meal_count;
+	int				t_eat;
+	int				t_sleep;
+	int				t_die;
+}					t_philo;
 
 t_philos	*philo(uint8_t operation);
+void		*philo_routine(void *index);
+void		philo_life_cycle(t_philo *p);
 // parse utils
-int	ft_atoi(const char *str);
+int			ft_atoi(const char *str);
+uint64_t	philo_get_time();
+void		philo_print(int i, char const *msg);
+void		philo_destroy_mutex(uint64_t last);
 
 
 

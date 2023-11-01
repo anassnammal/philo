@@ -1,6 +1,6 @@
 #include "philo.h"
 
-static void	philo_destroy_mutex(uint64_t last)
+void		philo_destroy_mutex(uint64_t last)
 {
 	t_philos	*philos;
 	uint64_t	i;
@@ -45,13 +45,13 @@ static void	philo_join_thread(uint64_t last)
 static void	philo_launch_threads()
 {
 	t_philos	*philos;
-	uint64_t	i;
+	int			i;
 
 	philos = philo(GET_PHILOS_PTR);
 	i = 0;
 	while (i < philos->params->n_philo)
 	{
-		if (pthread_create(philos->philos + i, NULL, NULL, ((void *)i)))
+		if (pthread_create(philos->philos + i, NULL, philo_routine, ((void *)i)))
 		{
 			philo_detach_thread(i);
 			philo(RELEASE_ALL);

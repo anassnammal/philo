@@ -20,7 +20,7 @@ static bool	philo_parse_params(t_var *params, int c, char const **av)
 static bool	philo_init(t_var *params)
 {
 	t_philos	*philos;
-	uint64_t	i;
+	int			i;
 
 	philos = philo(GET_PHILOS_PTR);
 	philos->philos = (pthread_t *)malloc(sizeof(pthread_t) * params->n_philo);
@@ -34,12 +34,12 @@ static bool	philo_init(t_var *params)
 	while (i < params->n_philo)
 	{
 		if (pthread_mutex_init(&philos->forks[i], NULL))
-			return (philo_forks_destroy(i), philo(CLEAR_ALL_MEM), false);
+			return (philo_destroy_mutex(i), philo(CLEAR_ALL_MEM), false);
 		i++;
 	}
 	if (pthread_mutex_init(&philos->print, NULL))
 		return (philo(CLEAR_ALL_MEM | DESTROY_FORKS), false);
-	return (&philos);
+	return (true);
 }
 
 int main(int ac, char const **av)
@@ -47,7 +47,7 @@ int main(int ac, char const **av)
 	t_var	params;
 
 	memset(&params, 0, sizeof(t_var));
-	if (!parse_params(&params, ac - 1, av + 1))
+	if (!philo_parse_params(&params, ac - 1, av + 1))
 	{
 		write(STDOUT_FILENO, "Error!\ninvalid params\n", 22);
 		return (EXIT_FAILURE);
@@ -57,5 +57,6 @@ int main(int ac, char const **av)
 		write(STDOUT_FILENO, "Error!\nfailed to get enough resources\n", 38);
 		return (EXIT_FAILURE);
 	}
+	philo(RELEASE_ALL | JOIN_PHILOS);
 	return 0;
 }
