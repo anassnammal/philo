@@ -1,6 +1,6 @@
 #include "philo.h"
 
-bool	parse_params(t_var *params, int c, char const **av)
+bool	philo_parse_params(t_var *params, int c, char const **av)
 {
 	int	*ptr;
 
@@ -17,31 +17,7 @@ bool	parse_params(t_var *params, int c, char const **av)
 	return (true);
 }
 
-t_philos	*init_philos(t_var *params)
-{
-	static t_philos	philos;
-	uint64_t		i;
 
-	if (!params)
-		return (&philos);
-	philos.philos = (pthread_t *)malloc(sizeof(pthread_t) * params->n_philo);
-	if (philos.philos == NULL)
-		return (NULL);
-	philos.forks = (pthread_mutex_t *)malloc(sizeof(pthread_mutex_t) * params->n_philo);
-	if (philos.forks == NULL)
-		return (free(philos.philos), NULL);
-	philos.params = params;
-	i = 0;
-	while (i < params->n_philo)
-	{
-		if (pthread_mutex_init(&philos.forks[i], NULL))
-			return (destroy_forks(i), free(philos.philos), free(philos.forks), NULL);
-		i++;
-	}
-	if (pthread_mutex_init(&philos.print, NULL))
-		return (destroy_forks(i), free(philos.philos), free(philos.forks), NULL);
-	return (&philos);
-}
 
 int main(int ac, char const **av)
 {
