@@ -10,17 +10,15 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-#define GET_PHILOS_PTR	0x0
-#define LAUNCH_PHILOS	0x1
-#define DESTROY_FORKS	0x2
-#define	DETACH_PHILOS	0x4
-#define JOIN_PHILOS		0x8
-#define DESTROY_PRINT	0x10
-#define RELEASE_MEMORY	0x20
-#define CLEAR_STCVAR	0x40
+#define PHILOS_PTR	0x0
+#define LOCK_PTR	0x1
+#define STATE_PTR	0x2
+#define PLOCK_PTR	0x4
+#define TEAT_PTR	0x8
+#define TSLEEP_PTR	0x10
+#define TDIE_PTR	0x20
+#define NMEALS_PTR	0x40
 
-#define CLEAR_ALL_MEM	0x60
-#define RELEASE_ALL		0x72
 
 #define M_TAKEFORK	"has taken a fork"
 #define M_EATING	"is eating"
@@ -31,62 +29,36 @@
 typedef struct s_var
 {
 	int	n_philo;
-	int	n_meals;
 	int	t_todie;
 	int	t_toeat;
 	int	t_tosleep;
+	int	n_meals;
 }		t_var;
 
 typedef enum e_state
 {
 	THINKING,
 	EATING,
-	SLEEPING,
 	DEAD,
 	FINICHED
 }	t_state;
 
-typedef struct s_philos
+typedef struct s_philo_vars
 {
-	pthread_t		*philos;
-	pthread_mutex_t	*forks;
-	pthread_mutex_t	print;
+	int				*philos;
+	pthread_t		*tid;
+	pthread_mutex_t	*locks;
+	t_state			*state;
 	t_var			*params;
-}					t_philos;
+}					t_philo_vars;
 
-typedef struct s_philo
-{
-	int				philo;
-	pthread_mutex_t	*r_forks;
-	pthread_mutex_t	*l_forks;
-	t_state			state;
-	int				meal_count;
-	int				t_eat;
-	int				t_sleep;
-	int				t_die;
-}					t_philo;
 
-t_philos	*philo(uint8_t operation);
-void		*philo_routine(void *index);
-void		philo_life_cycle(t_philo *p);
-// parse utils
-int			ft_atoi(const char *str);
-uint64_t	philo_get_time();
-void		philo_print(int i, char const *msg);
-void		philo_destroy_mutex(uint64_t last);
-
+int				ft_atoi(const char *);
 
 
 #endif
 
 /*
-	memset, printf, malloc, free, write,
-	usleep, gettimeofday, pthread_create,
-	pthread_detach, pthread_join, pthread_mutex_init,
-	pthread_mutex_destroy, pthread_mutex_lock,
-	pthread_mutex_unlock
-
-
 	F4 P0 F0
 	F1 P2 F2
 

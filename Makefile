@@ -13,14 +13,14 @@ CFLAGS=-g -Werror -Wall -Wextra -fsanitize=thread
 
 all: $(NAME)
 
-$(NAME): mkd $(OBJECTS)
-	$(CCOMPILER) $(CFLAGS) $^ $(CLIBRARY) -o $@
+$(NAME): $(OBJDIR) $(OBJECTS)
+	$(CCOMPILER) $(CFLAGS) $(OBJECTS) $(CLIBRARY) -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
+$(OBJDIR)/%.o: $(SRCDIR)/%.c $(HEADER)
 	$(CCOMPILER) $(CFLAGS) -c $< -I $(INCDIR)/ -o $@
 
-mkd:
-	mkdir -p $(OBJDIR)
+$(OBJDIR):
+	mkdir -p $@
 
 clean:
 	rm -rf $(OBJDIR)
@@ -30,4 +30,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY : all mkd clean fclean re
+.PHONY : all clean fclean re
