@@ -18,7 +18,10 @@ static bool	philo_parse_params(t_var *params, int c, char const **av)
 
 int main(int ac, char const **av)
 {
-	t_var	params;
+	t_var			params;
+	pthread_t		*tid;
+	pthread_mutex_t	*locks;
+	t_philo			*philo;
 
 	memset(&params, 0, sizeof(t_var));
 	if (!philo_parse_params(&params, ac - 1, av + 1))
@@ -26,12 +29,8 @@ int main(int ac, char const **av)
 		write(STDOUT_FILENO, "Error!\ninvalid params\n", 22);
 		return (EXIT_FAILURE);
 	}
-	if (!philo_init(&params))
-	{
-		write(STDOUT_FILENO, "Error!\nfailed to allocate enough memory\n", 40);
-		return (EXIT_FAILURE);
-	}
-	philo_start();
+	
+
 	return 0;
 
 }

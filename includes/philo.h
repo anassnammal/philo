@@ -39,19 +39,20 @@ typedef enum e_state
 {
 	THINKING,
 	EATING,
+	SLEEPING,
 	DEAD,
 	FINICHED
 }	t_state;
 
-typedef struct s_philo_vars
+typedef struct s_philo
 {
-	int				*philos;
-	pthread_t		*tid;
-	pthread_mutex_t	*locks;
-	t_state			*state;
+	int				id;
+	t_state			state;
+	pthread_mutex_t	*right;
+	pthread_mutex_t	*left;
+	pthread_mutex_t	*print;
 	t_var			*params;
-}					t_philo_vars;
-
+}					t_philo;
 
 int				ft_atoi(const char *);
 
