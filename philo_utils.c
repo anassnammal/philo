@@ -1,12 +1,6 @@
 #include "philo.h"
 
-// uint64_t	philo_get_time()
-// {
-// 	struct timeval	time;
-// 	if (gettimeofday(&time, NULL) < 0)
-// 		return (0);
-// 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
-// }
+
 
 // void		philo_print(int i, char const *msg)
 // {

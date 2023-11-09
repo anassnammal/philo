@@ -44,15 +44,17 @@ typedef enum e_state
 	FINICHED
 }	t_state;
 
+typedef pthread_mutex_t t_lock;
+
 typedef struct s_philo
 {
-	int				id;
-	t_state			state;
-	pthread_mutex_t	*right;
-	pthread_mutex_t	*left;
-	pthread_mutex_t	*print;
-	t_var			*params;
-}					t_philo;
+	int		id;
+	t_state	state;
+	t_lock	*right;
+	t_lock	*left;
+	t_lock	*print;
+	t_var	*params;
+}			t_philo;
 
 int				ft_atoi(const char *);
 
