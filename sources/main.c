@@ -32,7 +32,7 @@ void	philo_destroy_mutex(t_lock *lock, int last)
 	}
 }
 
-bool	philo_init_mutex(t_philo *ph, t_lock *lock, t_var *p)
+bool	philo_init(t_philo *ph, t_lock *lock, t_var *p)
 {
 	int	i;
 
@@ -59,24 +59,6 @@ bool	philo_init_mutex(t_philo *ph, t_lock *lock, t_var *p)
 	return (true);
 }
 
-t_philo	*philo_init(t_var *params, pthread_t *tid, t_lock *lock)
-{
-	t_philo	*philos;
-
-	tid = (pthread_t *)malloc(sizeof(pthread_t) * params->n_philo);
-	if (!tid)
-		return (NULL);
-	lock = (t_lock *)malloc(sizeof(t_lock) * params->n_philo + 1);
-	if (!lock)
-		return (free(tid), NULL);
-	philos = (t_philo *)malloc(sizeof(t_philo) * params->n_philo);
-	if (!philos)
-		return (free(tid), free(lock), NULL);
-	if (!philo_init_mutex(philos, lock, params->n_philo))
-		return (free(tid), free(lock), free(philos), NULL);
-	return (philos);
-}
-
 int main(int ac, char const **av)
 {
 	t_var		params;
@@ -86,14 +68,19 @@ int main(int ac, char const **av)
 
 	memset(&params, 0, sizeof(t_var));
 	if (!philo_parse_params(&params, ac - 1, av + 1))
-	{
-		write(STDOUT_FILENO, "Error!\ninvalid params\n", 22);
 		return (EXIT_FAILURE);
-	}
-	philo = philo_init(&params, tid, locks);
-	if (philo == NULL)
+	tid = (pthread_t *)malloc(sizeof(pthread_t) * params.n_philo);
+	if (!tid)
 		return (EXIT_FAILURE);
-	
+	locks = (t_lock *)malloc(sizeof(t_lock) * params.n_philo + 1);
+	if (!locks)
+		return (free(tid), EXIT_FAILURE);
+	philo = (t_philo *)malloc(sizeof(t_philo) * params.n_philo);
+	if (!philo)
+		return (free(tid), free(locks), NULL);
+	if (!philo_init(philo, locks, &params))
+		return (EXIT_FAILURE);
+	philo_start();
 	return 0;
 
 }

@@ -33,7 +33,6 @@ typedef struct s_var
 	int	t_toeat;
 	int	t_tosleep;
 	int	n_meals;
-	int	t_tothink;
 }		t_var;
 
 typedef enum e_state
