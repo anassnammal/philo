@@ -16,71 +16,51 @@ static bool	philo_parse_params(t_var *params, int c, char const **av)
 	return (true);
 }
 
-void	philo_destroy_mutex(t_lock *lock, int last)
+static void	philo_start_simulation()
 {
+	t_data	*p_data;
 	int		i;
 
+	p_data = (t_data *)philo_get(PHILO_DATA_PTR);
 	i = 0;
-	while (i < last)
+	while (i < p_data->params->n_philo)
 	{
-		if (pthread_mutex_destroy(lock + i))
+		if (pthread_create(p_data->tid + i, NULL, NULL, p_data->philos + i))
 		{
-			perror("ERROR!\npthread mutex destroy");
-			break ;
+			perror("pthread create");
+			return ;
+		}
+		if (!p_data->params->n_meals && pthread_detach(p_data->tid[i]))
+		{
+			perror("pthread detach");
+			return ;
 		}
 		i++;
 	}
 }
 
-bool	philo_init(t_philo *ph, t_lock *lock, t_var *p)
-{
-	int	i;
-
-	i = -1;
-	while (++i < p->n_philo)
-	{
-		ph->id = i + 1;
-		ph->state = THINKING;
-		ph->right = lock + i;
-		ph->left = lock + (i + 1) % p->n_philo;
-		ph->print = lock + p->n_philo;
-		ph->params = p;
-		if (pthread_mutex_init(lock + i, NULL))
-		{
-			perror("ERROR!\npthread mutex init");
-			return (philo_destroy_mutex(lock, i), false);
-		}
-	}
-	if (pthread_mutex_init(lock + i, NULL))
-	{
-		perror("ERROR!\npthread mutex init");
-		return (philo_destroy_mutex(lock, i), false);
-	}
-	return (true);
-}
-
 int main(int ac, char const **av)
 {
 	t_var		params;
-	pthread_t	*tid;
-	t_lock		*locks;
-	t_philo		*philo;
+	t_lock	*death_lock;
+	bool	*death_flag;
 
 	memset(&params, 0, sizeof(t_var));
 	if (!philo_parse_params(&params, ac - 1, av + 1))
 		return (EXIT_FAILURE);
-	tid = (pthread_t *)malloc(sizeof(pthread_t) * params.n_philo);
-	if (!tid)
+	if (!philo_init(&params))
 		return (EXIT_FAILURE);
-	locks = (t_lock *)malloc(sizeof(t_lock) * params.n_philo + 1);
-	if (!locks)
-		return (free(tid), EXIT_FAILURE);
-	philo = (t_philo *)malloc(sizeof(t_philo) * params.n_philo);
-	if (!philo)
-		return (free(tid), free(locks), NULL);
-	if (!philo_init(philo, locks, &params))
-		return (EXIT_FAILURE);
-	philo_start();
-	return 0;
+	philo_start_simulation();
 
+	death_flag = (bool *)philo_get(PHILO_DATA_PDF);
+	while (true)
+	{
+		pthread_mutex_lock(death_lock);
+		if (*death_flag)
+			break ;
+		pthread_mutex_unlock(death_lock);
+		usleep(100);
+	}
+	philo_release_res();
+	return 0;
 }

@@ -10,21 +10,22 @@
 #include <pthread.h>
 #include <sys/time.h>
 
-#define PHILOS_PTR	0x0
-#define LOCK_PTR	0x1
-#define STATE_PTR	0x2
-#define PLOCK_PTR	0x4
-#define TEAT_PTR	0x8
-#define TSLEEP_PTR	0x10
-#define TDIE_PTR	0x20
-#define NMEALS_PTR	0x40
-
+#define PHILO_DATA_PTR 0x0
+#define PHILO_DATA_TID 0x1
+#define PHILO_DATA_MTX 0x2
+#define PHILO_DATA_PRM 0x4
+#define PHILO_DATA_PHL 0x8
+#define PHILO_DATA_PDF 0x10
+#define PHILO_DATA_PDM 0x20
+#define PHILO_DATA_PPM 0x40
 
 #define M_TAKEFORK	"has taken a fork"
 #define M_EATING	"is eating"
 #define M_SLEEPING	"is sleeping"
 #define M_THINKING	"is thinking"
 #define M_DIE		"die"
+
+typedef pthread_mutex_t	t_lock;
 
 typedef struct s_var
 {
@@ -40,25 +41,37 @@ typedef enum e_state
 	THINKING,
 	EATING,
 	SLEEPING,
-	DEAD,
 	FINICHED
 }	t_state;
 
-typedef pthread_mutex_t t_lock;
-
 typedef struct s_philo
 {
-	int		id;
-	t_state	state;
-	t_lock	*right;
-	t_lock	*left;
-	t_lock	*print;
-	t_var	*params;
+	int			id;
+	int			count_meal;
+	uint64_t	last_meal;
+	bool		*is_dead;
+	t_lock		*right;
+	t_lock		*left;
+	t_var		*params;
 }			t_philo;
 
-int				ft_atoi(const char *);
+typedef struct s_data
+{
+	pthread_t	*tid;
+	t_lock		*locks;
+	t_philo		*philos;
+	t_var		*params;
+	bool		is_dead;
+}	t_data;
 
-
+int			ft_atoi(const char *);
+void		*philo_get(uint8_t);
+bool 		philo_init(t_var *);
+void		philo_destroy_mutex(int);
+void		philo_release_res();
+void		philo_err(char const *);
+uint64_t	philo_get_time();
+void		philo_print(t_philo *, uint64_t, char const *);
 #endif
 
 /*
