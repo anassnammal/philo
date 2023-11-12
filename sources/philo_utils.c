@@ -22,11 +22,11 @@ void 		philo_release_res() // to review
 {
     t_data *philo_data;
 
-    philo_data = philo_get_data();
+    philo_data = philo_get(PHILO_DATA_PTR);
     free(philo_data->tid);
     free(philo_data->locks);
     free(philo_data->philos);
-    philo_destroy_mutex(philo_data->params->n_philo + 2);
+    philo_destroy_mutex(philo_data->params->n_philo + 3);
 }
 
 void		philo_err(char const *err_msg) // may not bee necessary
@@ -51,7 +51,7 @@ void		philo_print(t_philo *p, uint64_t c_ms, char const *msg)
 {
 	t_lock	*print_lock;
 
-	print_lock = (t_lock *)philo_get(PHILO_DATA_PPM);
+	print_lock = (t_lock *)philo_get(PHILO_LOCK_PRT);
 	pthread_mutex_lock(print_lock);
 	printf("%"PRId64" %d %s\n", c_ms, p->id, msg);
 	pthread_mutex_unlock(print_lock);

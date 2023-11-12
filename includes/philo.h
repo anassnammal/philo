@@ -15,9 +15,9 @@
 #define PHILO_DATA_MTX 0x2
 #define PHILO_DATA_PRM 0x4
 #define PHILO_DATA_PHL 0x8
-#define PHILO_DATA_PDF 0x10
-#define PHILO_DATA_PDM 0x20
-#define PHILO_DATA_PPM 0x40
+#define PHILO_LOCK_PRT 0x10
+#define PHILO_LOCK_LML 0x20
+#define PHILO_LOCK_MCT 0x40
 
 #define M_TAKEFORK	"has taken a fork"
 #define M_EATING	"is eating"
@@ -36,20 +36,11 @@ typedef struct s_var
 	int	n_meals;
 }		t_var;
 
-typedef enum e_state
-{
-	THINKING,
-	EATING,
-	SLEEPING,
-	FINICHED
-}	t_state;
-
 typedef struct s_philo
 {
 	int			id;
 	int			count_meal;
 	uint64_t	last_meal;
-	bool		*is_dead;
 	t_lock		*right;
 	t_lock		*left;
 	t_var		*params;
@@ -61,7 +52,6 @@ typedef struct s_data
 	t_lock		*locks;
 	t_philo		*philos;
 	t_var		*params;
-	bool		is_dead;
 }	t_data;
 
 int			ft_atoi(const char *);
@@ -72,6 +62,7 @@ void		philo_release_res();
 void		philo_err(char const *);
 uint64_t	philo_get_time();
 void		philo_print(t_philo *, uint64_t, char const *);
+void		*philo_routine(void *ptr);
 #endif
 
 /*

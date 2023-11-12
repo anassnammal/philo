@@ -16,34 +16,63 @@ static bool	philo_parse_params(t_var *params, int c, char const **av)
 	return (true);
 }
 
-static void	philo_start_simulation()
+static bool	philo_start_simulation()
 {
-	t_data	*p_data;
+	t_data	*d;
 	int		i;
 
-	p_data = (t_data *)philo_get(PHILO_DATA_PTR);
+	d = (t_data *)philo_get(PHILO_DATA_PTR);
 	i = 0;
-	while (i < p_data->params->n_philo)
+	while (i < d->params->n_philo)
 	{
-		if (pthread_create(p_data->tid + i, NULL, NULL, p_data->philos + i))
+		if (pthread_create(&d->tid[i], NULL, philo_routine, &d->philos[i]))
 		{
 			perror("pthread create");
-			return ;
+			return (false);
 		}
-		if (!p_data->params->n_meals && pthread_detach(p_data->tid[i]))
+		if (pthread_detach(d->tid[i]))
 		{
 			perror("pthread detach");
-			return ;
+			return (false);
 		}
 		i++;
 	}
+	return (true);
+}
+
+static bool	philo_died(t_philo *p, uint64_t now)
+{
+	bool	is_dead;
+
+	is_dead = false;
+	pthread_mutex_lock(philo_get(PHILO_LOCK_LML));
+	if (now - p->last_meal >= (uint64_t)p->params->t_todie)
+	{
+		is_dead = true;
+		philo_print(p, now, M_DIE);
+	}
+	pthread_mutex_unlock(philo_get(PHILO_LOCK_LML));
+	return (is_dead);
+}
+
+static bool	philo_finished(t_philo *p)
+{
+	bool	is_finished;
+
+	is_finished = false;
+	pthread_mutex_lock(philo_get(PHILO_LOCK_MCT));
+	if (p->count_meal == p->params->n_meals)
+		is_finished = true;
+	pthread_mutex_unlock(philo_get(PHILO_LOCK_MCT));
+	return (is_finished);
 }
 
 int main(int ac, char const **av)
 {
 	t_var		params;
-	t_lock	*death_lock;
-	bool	*death_flag;
+	t_philo		*philos;
+	int			c;
+	int			i;
 
 	memset(&params, 0, sizeof(t_var));
 	if (!philo_parse_params(&params, ac - 1, av + 1))
@@ -51,16 +80,19 @@ int main(int ac, char const **av)
 	if (!philo_init(&params))
 		return (EXIT_FAILURE);
 	philo_start_simulation();
-
-	death_flag = (bool *)philo_get(PHILO_DATA_PDF);
+	philos = philo_get(PHILO_DATA_PHL);
+	i = 0;
+	c = 0;
 	while (true)
 	{
-		pthread_mutex_lock(death_lock);
-		if (*death_flag)
+		if (philo_died(philos + i, philo_get_time()))
 			break ;
-		pthread_mutex_unlock(death_lock);
-		usleep(100);
+		c += philo_finished(philos + i);
+		if (c == params.n_meals)
+			break ;
+		i++;
+		if (i == params.n_philo)
+			i = 0;
 	}
-	philo_release_res();
-	return 0;
+	return (philo_release_res(), 0);
 }
