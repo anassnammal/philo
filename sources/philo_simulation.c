@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philo_simulation.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: anammal <anammal@student.1337.ma>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2023/11/15 08:22:33 by anammal           #+#    #+#             */
+/*   Updated: 2023/11/15 08:22:36 by anammal          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "philo.h"
 
 static void	philo_destroy_locks(t_mutex *l, uint64_t n)
@@ -60,13 +72,8 @@ static void	philo_init(t_philo *p, t_mutex *l, uint64_t n)
 		p[i].id = i + 1;
 		p[i].last_meal = 0;
 		p[i].state = true;
-		p[i].right_l = l + i;
-		p[i].left_l = (l + (i + 1) % n);
-		if (i % 2 == 0)
-		{
-			p[i].right_l = (l + (i + 1) % n);
-			p[i].left_l = l + i;
-		}
+		p[i].right_l = l + (i + (i % 2 == 0)) % n;
+		p[i].left_l = l + (i + (i % 2)) % n;
 		p[i].state_l = l + n + i;
 		p[i].print_l = l + n * 2;
 		i++;
