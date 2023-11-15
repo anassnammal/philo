@@ -31,8 +31,8 @@ void		philo_monitor(t_philo *p)
 		i = 0;
 		while (i < params->n_philo)
 		{
-			now = philo_get_time();
 			pthread_mutex_lock(p[i].state_l);
+			now = philo_get_time();
 			if (!p[i].state)
 				f++;
 			else if (now - p[i].last_meal >= params->t_die)
