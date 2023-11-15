@@ -99,7 +99,8 @@ void	philo_simulation(t_philo *p, pthread_t *t, t_mutex *l, uint64_t n)
 		i++;
 	}
 	philo_monitor(p);
-	philo_join(t, n);
-	philo_destroy_locks(l, n * 2 + 1);
+	if (n == 1)
+		pthread_detach(t[0]);
+	else
+		(philo_join(t, n), philo_destroy_locks(l, n * 2 + 1));
 }
-

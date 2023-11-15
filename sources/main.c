@@ -12,7 +12,7 @@
 
 #include "philo.h"
 
-t_var		*philo_get_params()
+t_var	*philo_get_params(void)
 {
 	static t_var	params;
 
@@ -35,7 +35,7 @@ static bool	philo_parse_params(int c, char const **av)
 	return (true);
 }
 
-int			 main(int ac, char const **av) // need error msg
+int	main(int ac, char const **av)
 {
 	t_philo		*philos;
 	pthread_t	*tids;
@@ -43,7 +43,7 @@ int			 main(int ac, char const **av) // need error msg
 	uint64_t	n;
 
 	if (!philo_parse_params(ac - 1, av + 1))
-		return (perror("ff"),EXIT_FAILURE);
+		return (perror("ff"), EXIT_FAILURE);
 	n = philo_get_params()->n_philo;
 	philos = (t_philo *)malloc(sizeof(t_philo) * n);
 	if (!philos)

@@ -27,7 +27,7 @@ uint64_t	philo_atoui64(const char *str)
 	return (n * (*str == 0));
 }
 
-uint64_t	philo_get_time()
+uint64_t	philo_get_time(void)
 {
 	static uint64_t	first_ms;
 	uint64_t		now_ms;
@@ -40,30 +40,26 @@ uint64_t	philo_get_time()
 	return (now_ms - first_ms);
 }
 
-void		philo_update_state(t_philo	*p, bool new)
+void	philo_update_state(t_philo	*p, bool new)
 {
 	pthread_mutex_lock(p->state_l);
 	p->state = new;
 	pthread_mutex_unlock(p->state_l);
 }
 
-bool		philo_state(t_philo *p)
+bool	philo_state(t_philo *p)
 {
 	bool	state;
+
 	pthread_mutex_lock(p->state_l);
 	state = p->state;
 	pthread_mutex_unlock(p->state_l);
 	return (state);
 }
 
-void		philo_print(t_philo	*p, uint64_t t_ms, char *msg)
+void	philo_print(t_philo	*p, uint64_t t_ms, char *msg)
 {
 	pthread_mutex_lock(p->print_l);
 	printf("%"PRId64" %"PRId64" %s\n", t_ms, p->id, msg);
 	pthread_mutex_unlock(p->print_l);
 }
-
-
-
-
-

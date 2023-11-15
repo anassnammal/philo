@@ -22,15 +22,15 @@
 # include <inttypes.h>
 # include <sys/time.h>
 
-#define M_TAKEFORK	"has taken a fork"
-#define M_EATING	"is eating"
-#define M_SLEEPING	"is sleeping"
-#define M_THINKING	"is thinking"
-#define M_DIE		"die"
+# define M_TAKEFORK	"has taken a fork"
+# define M_EATING	"is eating"
+# define M_SLEEPING	"is sleeping"
+# define M_THINKING	"is thinking"
+# define M_DIE		"die"
 
-typedef	pthread_mutex_t t_mutex;
+typedef pthread_mutex_t	t_mutex;
 
-typedef	struct s_var
+typedef struct s_var
 {
 	uint64_t	n_philo;
 	uint64_t	t_die;
@@ -50,11 +50,11 @@ typedef struct s_philo
 	t_mutex		*print_l;
 }	t_philo;
 void		philo_simulation(t_philo *p, pthread_t *t, t_mutex *l, uint64_t n);
-t_var		*philo_get_params();
+t_var		*philo_get_params(void);
 void		*philo_routine(void *ptr);
 void		philo_monitor(t_philo *p);
 uint64_t	philo_atoui64(const char *str);
-uint64_t	philo_get_time();
+uint64_t	philo_get_time(void);
 void		philo_update_state(t_philo	*p, bool new);
 bool		philo_state(t_philo *p);
 void		philo_print(t_philo	*p, uint64_t t_ms, char *msg);

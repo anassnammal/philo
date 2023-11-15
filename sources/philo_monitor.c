@@ -28,7 +28,7 @@ static void	philo_died(t_philo *p, uint64_t i, uint64_t now, uint64_t n)
 	philo_print(p + i, now, M_DIE);
 }
 
-void		philo_monitor(t_philo *p)
+void	philo_monitor(t_philo *p)
 {
 	t_var		*params;
 	uint64_t	now;
