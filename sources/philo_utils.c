@@ -7,7 +7,7 @@ uint64_t	philo_atoui64(const char *str)
 	n = 0;
 	while (*str >= 48 && *str <= 57)
 	{
-		if ((n * 10 + ((*str) - 48)) % 10 != (*(str) - 48))
+		if ((n * 10 + ((*str) - 48)) % 10 != (uint64_t)(*(str) - 48))
 			return (0);
 		n = n * 10 + ((*str) - 48);
 		str++;
