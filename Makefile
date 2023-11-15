@@ -8,7 +8,7 @@ OBJECTS=$(addprefix $(OBJDIR)/, $(notdir $(patsubst %.c, %.o, $(SOURCES))))
 
 CCOMPILER=cc
 CLIBRARY=-pthread
-CFLAGS=-g -Werror -Wall -Wextra -fsanitize=thread
+CFLAGS=-g -Werror -Wall -Wextra #-fsanitize=thread
 
 
 all: $(NAME)

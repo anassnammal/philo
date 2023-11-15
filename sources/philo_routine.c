@@ -1,58 +1,61 @@
 #include "philo.h"
 
-static void	philo_eat(t_philo *philo)
+void	philo_take_forks(t_philo *p)
 {
-	pthread_mutex_lock(philo->right);
-	philo_print(philo, philo_get_time(), M_TAKEFORK);
-	pthread_mutex_lock(philo->left);
-	philo_print(philo, philo_get_time(), M_TAKEFORK);
-	philo_print(philo, philo_get_time(), M_EATING);
-	pthread_mutex_lock(philo_get(PHILO_LOCK_LML));
-	philo->last_meal = philo_get_time();
-	pthread_mutex_unlock(philo_get(PHILO_LOCK_LML));
-	usleep(philo->params->t_toeat * 1000);
-	pthread_mutex_unlock(philo->right);
-	pthread_mutex_unlock(philo->left);
+	if (!philo_state(p))
+		return ;
+	pthread_mutex_lock(p->right_l);
+	if (!philo_state(p))
+		return ;
+	philo_print(p, philo_get_time(), M_TAKEFORK);
+	pthread_mutex_lock(p->left_l);
+	if (!philo_state(p))
+		return ;
+	philo_print(p, philo_get_time(), M_TAKEFORK);
+	pthread_mutex_lock(p->state_l);
+	p->last_meal = philo_get_time();
+	pthread_mutex_unlock(p->state_l);
 }
 
-static void	philo_sleep(t_philo *philo)
+void	philo_act(t_philo *p, uint64_t ms, char *msg)
 {
-	philo_print(philo, philo_get_time(), M_SLEEPING);
-	usleep(philo->params->t_tosleep * 1000);
-}
+	uint64_t	now;
 
-static void	philo_think(t_philo *philo)
-{
-	philo_print(philo, philo_get_time(), M_THINKING);
-	usleep(100);
+	now = philo_get_time();
+	if (!philo_state(p))
+		return ;
+	philo_print(p, now, msg);
+	while (philo_get_time() - now <= ms)
+	{
+		usleep(1000);
+		if (!philo_state(p))
+			break ;
+	}
 }
 
 void	*philo_routine(void *ptr)
 {
 	t_philo		*philo;
+	t_var		*params;
+	uint64_t	meal_count;
 
 	philo = (t_philo *)ptr;
-	pthread_mutex_lock(philo_get(PHILO_LOCK_LML));
-	philo->last_meal = philo_get_time();
-	pthread_mutex_unlock(philo_get(PHILO_LOCK_LML));
-	if (!(philo->id % 2))
-		usleep(100);
-	while (true)
+	params = philo_get_params();
+	meal_count = params->n_meals;
+	while (philo_state(philo))
 	{
-		philo_eat(philo);
-		if (philo->params->n_meals)
+		philo_take_forks(philo);
+		philo_act(philo, params->t_eat, M_EATING);
+		pthread_mutex_unlock(philo->right_l);
+		pthread_mutex_unlock(philo->left_l);
+		if (meal_count)
 		{
-			pthread_mutex_lock(philo_get(PHILO_LOCK_MCT));
-			philo->count_meal++;
-			if (philo->count_meal == philo->params->n_meals)
-			{
-				pthread_mutex_unlock(philo_get(PHILO_LOCK_MCT));
-				break ;
-			}
-			pthread_mutex_unlock(philo_get(PHILO_LOCK_MCT));
+			meal_count--;
+			if (!meal_count)
+				philo_update_state(philo, false);
 		}
-		philo_sleep(philo);
-		philo_think(philo);
+		philo_act(philo, params->t_sleep, M_SLEEPING);
+		philo_act(philo, 1, M_THINKING);
 	}
-	return (NULL);	
+	return (NULL);
 }

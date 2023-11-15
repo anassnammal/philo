@@ -1,37 +1,18 @@
 #include "philo.h"
 
-void		 philo_destroy_mutex(int last)
+uint64_t	philo_atoui64(const char *str)
 {
-    t_lock *locks;
-    int     i;
+	uint64_t	n;
 
-    locks = philo_get(PHILO_DATA_MTX);
-    i = 0;
-    while (i < last)
-    {
-        if (pthread_mutex_destroy(locks + i))
-        {
-            perror("ERROR!\npthread mutex destroy");
-            break;
-        }
-        i++;
-    }
-}
-
-void 		philo_release_res() // to review
-{
-    t_data *philo_data;
-
-    philo_data = philo_get(PHILO_DATA_PTR);
-    free(philo_data->tid);
-    free(philo_data->locks);
-    free(philo_data->philos);
-    philo_destroy_mutex(philo_data->params->n_philo + 3);
-}
-
-void		philo_err(char const *err_msg) // may not bee necessary
-{
-	printf("%s\n", err_msg);
+	n = 0;
+	while (*str >= 48 && *str <= 57)
+	{
+		if ((n * 10 + ((*str) - 48)) % 10 != (*(str) - 48))
+			return (0);
+		n = n * 10 + ((*str) - 48);
+		str++;
+	}
+	return (n * (*str == 0));
 }
 
 uint64_t	philo_get_time()
@@ -47,12 +28,30 @@ uint64_t	philo_get_time()
 	return (now_ms - first_ms);
 }
 
-void		philo_print(t_philo *p, uint64_t c_ms, char const *msg)
+void		philo_update_state(t_philo	*p, bool new)
 {
-	t_lock	*print_lock;
-
-	print_lock = (t_lock *)philo_get(PHILO_LOCK_PRT);
-	pthread_mutex_lock(print_lock);
-	printf("%"PRId64" %d %s\n", c_ms, p->id, msg);
-	pthread_mutex_unlock(print_lock);
+	pthread_mutex_lock(p->state_l);
+	p->state = new;
+	pthread_mutex_unlock(p->state_l);
 }
+
+bool		philo_state(t_philo *p)
+{
+	bool	state;
+	pthread_mutex_lock(p->state_l);
+	state = p->state;
+	pthread_mutex_unlock(p->state_l);
+	return (state);
+}
+
+void		philo_print(t_philo	*p, uint64_t t_ms, char *msg)
+{
+	pthread_mutex_lock(p->print_l);
+	printf("%"PRId64" %"PRId64" %s\n", t_ms, p->id, msg);
+	pthread_mutex_unlock(p->print_l);
+}
+
+
+
+
+
